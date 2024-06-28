@@ -41,6 +41,52 @@ class TestExtractTmatrix(unittest.TestCase):
         np_test.assert_array_almost_equal(translation,expected_translation)
         np_test.assert_array_almost_equal(perspective,expected_perspective)
         np_test.assert_array_almost_equal(scale,expected_scale)
+
+class TestGenerateTmatrixFromDHparameter(unittest.TestCase):
+    def test_simple_rotation_z(self):
+        alpha = 0
+        a = 0
+        d = 0
+        theta = 45
+        result = forw_kin.generate_Tmatrix_from_DHparameter(alpha,a,d,theta)
+        expected = np.array([[0.707107,-0.707107,0,0],[0.707107,0.707107,0,0],[0,0,1,0],[0,0,0,1]])
+        np_test.assert_array_almost_equal(result,expected)
     
+    def test_simple_translation_z(self):
+        alpha = 0
+        a = 0
+        d = 1
+        theta = 0
+        result = forw_kin.generate_Tmatrix_from_DHparameter(alpha,a,d,theta)
+        expected = np.array([[1,0,0,0],[0,1,0,0],[0,0,1,1],[0,0,0,1]])
+        np_test.assert_array_almost_equal(result,expected)
+
+    def test_simple_rotation_x(self):
+        alpha = 45
+        a = 0
+        d = 0
+        theta = 0
+        result = forw_kin.generate_Tmatrix_from_DHparameter(alpha,a,d,theta)
+        expected = np.array([[1,0,0,0],[0,0.707107,-0.707107,0],[0,0.707107,0.707107,0],[0,0,0,1]])
+        np_test.assert_array_almost_equal(result,expected)
+    
+    def test_simple_translation_x(self):
+        alpha = 0
+        a = 1
+        d = 0
+        theta = 0
+        result = forw_kin.generate_Tmatrix_from_DHparameter(alpha,a,d,theta)
+        expected = np.array([[1,0,0,1],[0,1,0,0],[0,0,1,0],[0,0,0,1]])
+        np_test.assert_array_almost_equal(result,expected)
+
+    def test_combined(self):
+        alpha = 45
+        a = 1
+        d = 1
+        theta = 45
+        result = forw_kin.generate_Tmatrix_from_DHparameter(alpha,a,d,theta)
+        expected = np.array([[0.707107,-0.707107,0,1],[0.707107*0.707107,0.707107*0.707107,-0.707107,-0.707107],[0.707107*0.707107,0.707107*0.707107,0.707107,0.707107],[0,0,0,1]])
+        np_test.assert_array_almost_equal(result,expected)
+
 if __name__ == "__main__":
     unittest.main()

@@ -88,5 +88,28 @@ class TestGenerateTmatrixFromDHparameter(unittest.TestCase):
         expected = np.array([[0.707107,-0.707107,0,1],[0.707107*0.707107,0.707107*0.707107,-0.707107,-0.707107],[0.707107*0.707107,0.707107*0.707107,0.707107,0.707107],[0,0,0,1]])
         np_test.assert_array_almost_equal(result,expected)
 
+class TestGenerateCombinedTmatrixDHTable(unittest.TestCase):
+    def test_DHtable(self):
+        # DHtable : alpha, a , d, theta
+        DHtable = np.array([
+            [0,0,0,45],
+            [0,1,0,45],
+            [0,1,0,45]
+        ])
+        result = forw_kin.generate_combinedTmatrix_DHtable(DHtable)
+        expected = np.array([[-0.707107,-0.707107,0, 0.707107],[ 0.707107,-0.707107,0,1.707107],[ 0,0,1,0],[ 0,0,0,1]])
+        np_test.assert_array_almost_equal(result,expected)
+    def test_transformation(self):
+        DHtable = np.array([
+            [0,0,0,45],
+            [0,1,0,45],
+            [0,1,0,45]
+        ])
+        endeffector_position = np.array([[0],[0],[0],[1]])
+        transformation = forw_kin.generate_combinedTmatrix_DHtable(DHtable)
+        result = np.dot(transformation,endeffector_position)
+        expected = np.array([[0.707107],[1.707107],[0],[1]])
+        np_test.assert_array_almost_equal(result,expected)
+
 if __name__ == "__main__":
     unittest.main()

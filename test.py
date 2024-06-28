@@ -3,7 +3,7 @@ import numpy as np
 import numpy.testing as np_test
 import forward_kinematics as forw_kin
 
-class TestCreate_Tmatrix(unittest.TestCase):
+class TestCreateTmatrix(unittest.TestCase):
     theta = 45
     r_matrix = np.array([
             [np.cos(np.deg2rad(theta)), -np.sin(np.deg2rad(theta)), 0],
@@ -24,7 +24,7 @@ class TestCreate_Tmatrix(unittest.TestCase):
         expected = np.array([[0.707107,-0.707107,0,1],[0.707107,0.707107,0,2],[0,0,1,3],[0,0,0,1]])
         np_test.assert_array_almost_equal(result,expected)
 
-class TestExtract_Tmatrix(unittest.TestCase):
+class TestExtractTmatrix(unittest.TestCase):
     case = np.array([[0.707107,-0.707107,0,1],[0.707107,0.707107,0,2],[0,0,1,3],[0,0,0,1]])
     def test_extract(self):
         r_matrix, translation, perspective, scale = forw_kin.extract_Tmatrix(self.case)

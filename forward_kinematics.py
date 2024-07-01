@@ -51,12 +51,13 @@ def generate_combinedTmatrix_DHtable(DHtable):
     return combined_Tmatrix
 
 # DHtable : alpha, a , d, theta
-DHtable = np.array([
-    [0,0,0,45],
-    [0,1,0,45],
-    [0,1,0,45]
-])
-# transformation_matrix_2 = generate_combinedTmatrix_DHtable(DHtable)
-# b = np.array([[0],[0],[0],[1]])
-# a = np.dot(transformation_matrix_2,b)
-# print(a)
+
+def generate_joint_positions(DHtable):
+    positions = np.zeros((DHtable.shape[0],4))
+    positions[0,:] = np.array([0,0,0,1])
+    for i in range(0,DHtable.shape[0]-1):
+        Tmatrix = generate_combinedTmatrix_DHtable(DHtable[:i+1])
+        b_vector = np.array([[DHtable[i+1,1]],[0],[0],[1]])
+        position = np.dot(Tmatrix,b_vector)
+        positions[i+1,:4] = position.reshape(1,4)
+    return positions

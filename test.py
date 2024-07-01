@@ -111,5 +111,16 @@ class TestGenerateCombinedTmatrixDHTable(unittest.TestCase):
         expected = np.array([[0.707107],[1.707107],[0],[1]])
         np_test.assert_array_almost_equal(result,expected)
 
+class TestGenerateJointPositions(unittest.TestCase):
+    def test_positions(self):
+        DHtable = np.array([
+            [0,0,0,45],
+            [0,1,0,45],
+            [0,1,0,45]
+        ])
+        result = forw_kin.generate_joint_positions(DHtable)
+        expected = np.array([[0,0,0,1],[0.707107,0.707107,0,1],[0.707107,1.707107,0,1]])
+        np_test.assert_array_almost_equal(result,expected)
+
 if __name__ == "__main__":
     unittest.main()

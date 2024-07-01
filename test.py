@@ -85,10 +85,9 @@ class TestGenerateTmatrixFromDHparameter(unittest.TestCase):
         d = 1
         theta = 45
         result = forw_kin.generate_Tmatrix_from_DHparameter(alpha,a,d,theta)
-        expected = np.array([[0.707107,-0.707107,0,1],[0.707107*0.707107,0.707107*0.707107,-0.707107,-0.707107],[0.707107*0.707107,0.707107*0.707107,0.707107,0.707107],[0,0,0,1]])
+        expected = np.array([[0.707107,-0.707107*0.707107,0.707107*0.707107,0.707107],[0.707107,0.707107*0.707107,-0.707107*0.707107,0.707107],[0,0.707107,0.707107,1],[0,0,0,1]])
         np_test.assert_array_almost_equal(result,expected)
 
-# NOTE : Test Fail, this method result in first link to be parallel with x axis
 class TestGenerateCombinedTmatrixDHTable(unittest.TestCase):
     def test_DHtable(self):
         # DHtable : alpha, a , d, theta
@@ -113,12 +112,11 @@ class TestGenerateCombinedTmatrixDHTable(unittest.TestCase):
 class TestGenerateJointPositions(unittest.TestCase):
     def test_positions(self):
         DHtable = np.array([
-            [0,0,0,45],
             [0,1,0,45],
             [0,1,0,45]
         ])
         result = forw_kin.generate_joint_positions(DHtable)
-        expected = np.array([[0,0,0,1],[0.707107,0.707107,0,1],[0.707107,1.707107,0,1]])
+        expected = np.array([[0,0,0],[0.707107,0.707107,0],[0.707107,1.707107,0]])
         np_test.assert_array_almost_equal(result,expected)
 
 if __name__ == "__main__":

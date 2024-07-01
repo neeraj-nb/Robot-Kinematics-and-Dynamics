@@ -32,9 +32,9 @@ a = np.array([[5],[7.8],[7],[1]])
 
 def generate_Tmatrix_from_DHparameter(alpha,a, d,theta):
     general_transformation_matrix = np.array([
-        [np.cos(np.deg2rad(theta)),-np.sin(np.deg2rad(theta)),0,a],
-        [np.sin(np.deg2rad(theta))*np.cos(np.deg2rad(alpha)),np.cos(np.deg2rad(theta))*np.cos(np.deg2rad(alpha)),-np.sin(np.deg2rad(alpha)),-np.sin(np.deg2rad(alpha))*d],
-        [np.sin(np.deg2rad(theta))*np.sin(np.deg2rad(alpha)),np.cos(np.deg2rad(theta))*np.sin(np.deg2rad(alpha)),np.cos(np.deg2rad(alpha)),np.cos(np.deg2rad(alpha))*d],
+        [np.cos(np.deg2rad(theta)),-np.sin(np.deg2rad(theta))*np.cos(np.deg2rad(alpha)),np.sin(np.deg2rad(theta))*np.sin(np.deg2rad(alpha)),a*np.cos(np.deg2rad(theta))],
+        [np.sin(np.deg2rad(theta)),np.cos(np.deg2rad(theta))*np.cos(np.deg2rad(alpha)),-np.cos(np.deg2rad(theta))*np.sin(np.deg2rad(alpha)),a*np.sin(np.deg2rad(theta))],
+        [0,np.sin(np.deg2rad(alpha)),np.cos(np.deg2rad(alpha)),d],
         [0,0,0,1]
     ])
     return general_transformation_matrix
@@ -53,11 +53,10 @@ def generate_combinedTmatrix_DHtable(DHtable):
 # DHtable : alpha, a , d, theta
 
 def generate_joint_positions(DHtable):
-    positions = np.zeros((DHtable.shape[0],4))
-    positions[0,:] = np.array([0,0,0,1])
-    for i in range(0,DHtable.shape[0]-1):
+    positions = np.zeros((DHtable.shape[0]+1,3))
+    positions[0,:] = np.array([0,0,0])
+    for i in range(0,DHtable.shape[0]):
         Tmatrix = generate_combinedTmatrix_DHtable(DHtable[:i+1])
-        b_vector = np.array([[DHtable[i+1,1]],[0],[0],[1]])
-        position = np.dot(Tmatrix,b_vector)
-        positions[i+1,:4] = position.reshape(1,4)
+        r_matrix, translation, perspective, scale = extract_Tmatrix(Tmatrix)
+        positions[i+1,:3] = translation.reshape(1,3)
     return positions

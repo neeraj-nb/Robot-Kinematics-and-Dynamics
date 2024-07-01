@@ -5,14 +5,14 @@ import numpy as np
 import forward_kinematics as fw_kin
 
 DHtable = np.array([
-            [0,0,0,90],
-            [0,1,0,90],
+            [0,1,0,45],
             [0,1,0,45]
         ])
 fig = plt.figure()
 ax = plt.axes(projection='3d')
 
 position = fw_kin.generate_joint_positions(DHtable)
+print(position)
 linex = position[:,0]
 liney = position[:,1]
 linez = position[:,2]

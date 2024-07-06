@@ -17,7 +17,7 @@ DHtable = np.array([
         ])
 jointlimits = [[0,360],[0,360],[0,360],[0,360],[0,360],[0,360]]
 
-position = vel_kin.singularity(DHtable,jointlimits)
+position = vel_kin.singularity(DHtable,jointlimits,progress=True,parallel=True)
 
 linex = position[:,0]
 liney = position[:,1]

@@ -1,6 +1,8 @@
 import numpy as np
 import forward_kinematics as frw_kin
 import itertools
+import multiprocessing
+from functools import partial
 
 from tqdm import tqdm
 
@@ -25,22 +27,38 @@ def jacobian(DHtable):
     
     return Jacobian
 
-def singularity(DHtable, jointlimits):
-    n = 10
+def _singularity_worker(DHtable,progress,point):
+    DHtable[0:6,3] = np.array(list(point))
+    j = jacobian(DHtable)
+    if np.linalg.det(j)==0:
+        orientation, position, perspective, scale = frw_kin.extract_Tmatrix(frw_kin.generate_combinedTmatrix_DHtable(DHtable))
+    if progress:
+        progress.update()
+    return position
+    
+def singularity(DHtable, jointlimits,progress=False,parallel=False):
+    n = 3
     joint_space = [np.linspace(joint[0],joint[1],n) for joint in jointlimits]
     singularity = []
     simulation_space = list(itertools.product(joint_space[0],joint_space[1],joint_space[2],joint_space[3],joint_space[4],joint_space[5]))
-    compute = n**6
-    step = 0
-    pbar = tqdm(total=compute)
-    for point in simulation_space:
-        DHtable[0:6,3] = np.array(list(point))
-        j = jacobian(DHtable)
-        if np.linalg.det(j)==0:
-            orientation, position, perspective, scale = frw_kin.extract_Tmatrix(frw_kin.generate_combinedTmatrix_DHtable(DHtable))
-            singularity.append(position)
-        step = step + 1
-        pbar.update()
+    if progress:
+        compute = n**6
+        pbar = tqdm(total=compute)
+    if parallel:
+        pool = multiprocessing.Pool(processes=4)
+        if not progress:
+            pbar = False
+        target = partial(_singularity_worker,DHtable,pbar)
+        singularity = pool.map(target,simulation_space)
+    else:
+        for point in simulation_space:
+            DHtable[0:6,3] = np.array(list(point))
+            j = jacobian(DHtable)
+            if np.linalg.det(j)==0:
+                orientation, position, perspective, scale = frw_kin.extract_Tmatrix(frw_kin.generate_combinedTmatrix_DHtable(DHtable))
+                singularity.append(position)
+            if progress:
+                pbar.update()
     singularity = np.array(singularity)
 
     return singularity

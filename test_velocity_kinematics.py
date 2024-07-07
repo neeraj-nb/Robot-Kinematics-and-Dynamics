@@ -14,6 +14,7 @@ class TestJacobian(unittest.TestCase):
             [0,0,0.0565,45]
         ])
         result = vel_kin.jacobian(DHtable)
+        print(result)
 
 class TestSingularity(unittest.TestCase):
     def test_singularity(self):

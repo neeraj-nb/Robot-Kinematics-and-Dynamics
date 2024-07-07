@@ -5,7 +5,7 @@ import itertools
 from tqdm import tqdm
 
 def jacobian(DHtable):
-    Jacobian = np.zeros((6,6))
+    Jacobian = np.zeros((6,DHtable.shape[0]))
     T_0_6 = frw_kin.generate_combinedTmatrix_DHtable(DHtable)
     p_end = T_0_6[:3,3]
 
@@ -25,16 +25,15 @@ def jacobian(DHtable):
     
     return Jacobian
 
-def singularity(DHtable, jointlimits):
-    n = 10
+def singularity(DHtable, jointlimits,n):
     joint_space = [np.linspace(joint[0],joint[1],n) for joint in jointlimits]
     singularity = []
-    simulation_space = list(itertools.product(joint_space[0],joint_space[1],joint_space[2],joint_space[3],joint_space[4],joint_space[5]))
-    compute = n**6
+    simulation_space = list(itertools.product(*joint_space))
+    compute = n**DHtable.shape[0]
     step = 0
     pbar = tqdm(total=compute)
     for point in simulation_space:
-        DHtable[0:6,3] = np.array(list(point))
+        DHtable[:,3] = np.array(list(point))
         j = jacobian(DHtable)
         if np.linalg.det(j)==0:
             orientation, position, perspective, scale = frw_kin.extract_Tmatrix(frw_kin.generate_combinedTmatrix_DHtable(DHtable))

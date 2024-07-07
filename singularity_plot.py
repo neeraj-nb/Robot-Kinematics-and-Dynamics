@@ -17,13 +17,13 @@ DHtable = np.array([
         ])
 jointlimits = [[0,360],[0,360],[0,360],[0,360],[0,360],[0,360]]
 
-position = vel_kin.singularity(DHtable,jointlimits)
+position = vel_kin.singularity(DHtable,jointlimits,10)
 
 linex = position[:,0]
 liney = position[:,1]
 linez = position[:,2]
 
-ax.scatter(linex,liney,linez,color='r')
+ax.scatter(linex,liney,linez,color='b',s=0.1,alpha=0.3)
 ax.set_xlabel('x')
 ax.set_ylabel('y')
 ax.set_zlabel('z')

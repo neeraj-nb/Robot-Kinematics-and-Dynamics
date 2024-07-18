@@ -1,6 +1,7 @@
 import numpy as np
 import sympy as sym
 import forward_kinematics as forw_kin
+import velocity_kinematics as vel_kin
 
 
 def kinematic_decoupling(Tmatrix, DHtable):
@@ -53,11 +54,23 @@ def kinematic_decoupling(Tmatrix, DHtable):
     return R_0_3
 
 
-def netwon_raphson_rf_method(Tmatrix, DHtable: sym.Matrix, mt, me, ig):
-    joint_space = DHtable.free_symbols
+def netwon_raphson_rf_method(Tmatrix, DHtable, mt, me, ig):
     epoh = 0
     e = me
     while epoh < mt and e >= me:
-        DHtable.subs(ig)
-        T_i = forw_kin.generate_combinedTmatrix_DHtable(np.array(DHtable).astype(np.float64))
-    return joint_space
+        DHtable[:,3] = ig[0,0:6]
+        T_i = forw_kin.generate_combinedTmatrix_DHtable(DHtable)
+        T_delta = Tmatrix - T_i
+        delta = np.zeros((6,1))
+        delta[0:3,0] = T_delta[0:3,3]
+        delta_alpha = np.rad2deg(np.arctan2(T_delta[2,1],T_delta[2,2]))
+        delta_beta = np.rad2deg(np.arctan2(-T_delta[2,0],np.sqrt((T_delta[2,1]**2 +T_delta[2,2]**2))))
+        delta_gama = np.rad2deg(np.arctan2(T_delta[1,0],T_delta[0,0]))
+        delta[3:6,0:1] = np.array([[delta_alpha],[delta_beta],[delta_gama],])
+        jacobian_inv = np.linalg.pinv(vel_kin.jacobian(DHtable))
+        delta_theta = np.dot(jacobian_inv,delta)
+        print(delta)
+        ig = ig + delta_theta
+        epoh = epoh + 1
+        e = np.linalg.norm(delta[0:3])
+    return ig
